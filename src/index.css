@@ -1,10 +1,11 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -35,19 +36,12 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -96,6 +90,90 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
+
+  /* SF Pro Font */
+  @font-face {
+    font-family: 'SF Pro Display';
+    src: local('SF Pro Display'), local('SFProDisplay-Regular');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'SF Pro Display';
+    src: local('SF Pro Display Bold'), local('SFProDisplay-Bold');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'SF Mono';
+    src: local('SF Mono'), local('SFMono-Regular');
+    font-weight: 400;
+    font-style: normal;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-white/70 dark:bg-black/70 backdrop-blur-lg rounded-2xl border border-white/20 shadow-glass;
+  }
+  
+  .glass-panel-strong {
+    @apply bg-white/80 dark:bg-black/80 backdrop-blur-xl rounded-2xl border border-white/20 shadow-glass-strong;
+  }
+  
+  .neo-panel {
+    @apply bg-white rounded-2xl shadow-neo p-6;
+  }
+
+  .year-selector-item {
+    @apply relative px-4 py-2 rounded-full cursor-pointer transition-all duration-300;
+  }
+
+  .year-selector-item.active {
+    @apply bg-nasdaq-100 text-nasdaq-700 font-medium;
+  }
+
+  .stat-value {
+    @apply text-3xl font-medium transition-all duration-500;
+  }
+  
+  .stat-label {
+    @apply text-sm text-gray-500 font-medium tracking-wide uppercase transition-all duration-300;
+  }
+
+  .chart-container {
+    @apply w-full h-[400px] mt-8 transition-all duration-500 ease-in-out;
+  }
+}
+
+.recharts-tooltip-wrapper {
+  @apply !pointer-events-auto;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
 }

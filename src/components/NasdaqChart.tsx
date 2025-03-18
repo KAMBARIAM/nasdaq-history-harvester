@@ -1,0 +1,140 @@
+
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { 
+  LineChart, Line, XAxis, YAxis, CartesianGrid, 
+  Tooltip, Legend, ResponsiveContainer 
+} from 'recharts';
+import { YearlyStockData } from '@/utils/stockData';
+import { cn } from '@/lib/utils';
+
+interface NasdaqChartProps {
+  selectedData: YearlyStockData[];
+  className?: string;
+}
+
+const COLORS = [
+  '#0284c7', // nasdaq-600
+  '#0ea5e9', // nasdaq-500  
+  '#38bdf8', // nasdaq-400
+  '#7dd3fc', // nasdaq-300
+  '#bae6fd', // nasdaq-200
+  '#38bdf8', // nasdaq-400
+  '#7dd3fc', // nasdaq-300
+];
+
+export function NasdaqChart({ selectedData, className }: NasdaqChartProps) {
+  const [chartData, setChartData] = useState<any[]>([]);
+  
+  useEffect(() => {
+    if (!selectedData.length) return;
+    
+    // Process data for the chart
+    const transformedData = processChartData(selectedData);
+    setChartData(transformedData);
+  }, [selectedData]);
+
+  const processChartData = (yearlyData: YearlyStockData[]) => {
+    if (!yearlyData.length) return [];
+    
+    // Get all months (Jan-Dec)
+    const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    // Create transformed data structure
+    return monthLabels.map((month, index) => {
+      const dataPoint: any = { month };
+      
+      // Add value for each year
+      yearlyData.forEach(yearData => {
+        if (yearData.data[index]) {
+          dataPoint[`y${yearData.year}`] = yearData.data[index].value;
+          // Add data point label for tooltip
+          dataPoint[`${yearData.year}`] = `$${yearData.data[index].value.toLocaleString()}`;
+        }
+      });
+      
+      return dataPoint;
+    });
+  };
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="glass-panel-strong p-4 shadow-lg">
+          <p className="font-medium text-sm mb-2">{label}</p>
+          <div className="space-y-1">
+            {payload.map((entry: any, index: number) => (
+              <div key={index} className="flex items-center">
+                <div 
+                  className="w-3 h-3 rounded-full mr-2" 
+                  style={{ backgroundColor: entry.color }}
+                />
+                <span className="text-sm font-mono">
+                  {entry.name.substring(1)}: {entry.value.toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    maximumFractionDigits: 0
+                  })}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <motion.div 
+      className={cn("chart-container glass-panel p-4", className)}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.7, delay: 0.3 }}
+    >
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart
+          data={chartData}
+          margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <XAxis 
+            dataKey="month" 
+            tick={{ fontSize: 12 }}
+            tickLine={false}
+            axisLine={{ stroke: '#e0e0e0' }}
+          />
+          <YAxis 
+            tickFormatter={(value) => `$${value.toLocaleString()}`}
+            tick={{ fontSize: 12 }}
+            tickLine={false}
+            axisLine={{ stroke: '#e0e0e0' }}
+            domain={['auto', 'auto']}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend 
+            formatter={(value) => value.substring(1)} 
+            verticalAlign="top" 
+            height={36}
+          />
+          {selectedData.map((yearData, index) => (
+            <Line
+              key={yearData.year}
+              type="monotone"
+              dataKey={`y${yearData.year}`}
+              name={`y${yearData.year}`}
+              stroke={COLORS[index % COLORS.length]}
+              strokeWidth={2}
+              dot={{ r: 4, strokeWidth: 2 }}
+              activeDot={{ r: 6, strokeWidth: 2 }}
+              animationDuration={1500}
+              animationEasing="ease-in-out"
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
+    </motion.div>
+  );
+}
+
+export default NasdaqChart;
