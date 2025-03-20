@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -10,6 +11,7 @@ import { cn } from '@/lib/utils';
 interface NasdaqChartProps {
   selectedData: YearlyStockData[];
   className?: string;
+  currency?: string;
 }
 
 const COLORS = [
@@ -21,7 +23,7 @@ const COLORS = [
   '#10b981', // Emerald (additional color)
 ];
 
-export function NasdaqChart({ selectedData, className }: NasdaqChartProps) {
+export function NasdaqChart({ selectedData, className, currency = '$' }: NasdaqChartProps) {
   const [chartData, setChartData] = useState<any[]>([]);
   
   useEffect(() => {
@@ -42,7 +44,7 @@ export function NasdaqChart({ selectedData, className }: NasdaqChartProps) {
       yearlyData.forEach(yearData => {
         if (yearData.data[index]) {
           dataPoint[`y${yearData.year}`] = yearData.data[index].value;
-          dataPoint[`${yearData.year}`] = `$${yearData.data[index].value.toLocaleString()}`;
+          dataPoint[`${yearData.year}`] = `${currency}${yearData.data[index].value.toLocaleString()}`;
         }
       });
       
@@ -63,9 +65,7 @@ export function NasdaqChart({ selectedData, className }: NasdaqChartProps) {
                   style={{ backgroundColor: entry.color }}
                 />
                 <span className="text-sm font-mono">
-                  {entry.name.substring(1)}: {entry.value.toLocaleString('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
+                  {entry.name.substring(1)}: {currency}{entry.value.toLocaleString('en-US', {
                     maximumFractionDigits: 0
                   })}
                 </span>
@@ -98,7 +98,7 @@ export function NasdaqChart({ selectedData, className }: NasdaqChartProps) {
             axisLine={{ stroke: '#e0e0e0' }}
           />
           <YAxis 
-            tickFormatter={(value) => `$${value.toLocaleString()}`}
+            tickFormatter={(value) => `${currency}${value.toLocaleString()}`}
             tick={{ fontSize: 12 }}
             tickLine={false}
             axisLine={{ stroke: '#e0e0e0' }}

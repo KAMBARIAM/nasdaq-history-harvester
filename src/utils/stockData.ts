@@ -118,9 +118,352 @@ export const generateNasdaqData = (): YearlyStockData[] => {
   });
 };
 
+// Generate Dow Jones data
+export const generateDowJonesData = (): YearlyStockData[] => {
+  const years = [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 
+                 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 
+                 2021, 2022, 2023, 2024];
+  
+  return years.map(year => {
+    // Base values and trends based on historical Dow Jones performance
+    let baseValue, volatility, trend;
+    
+    // Simulate historical Dow Jones performance
+    if (year === 2001) {
+      baseValue = 10000; 
+      volatility = 0.12;
+      trend = -0.02; 
+    } else if (year === 2002) {
+      baseValue = 9800;
+      volatility = 0.14;
+      trend = -0.03; 
+    } else if (year === 2003) {
+      baseValue = 9500;
+      volatility = 0.11;
+      trend = 0.02; 
+    } else if (year >= 2004 && year <= 2007) {
+      baseValue = 10000 + (year - 2004) * 800; 
+      volatility = 0.08;
+      trend = 0.013;
+    } else if (year === 2008) {
+      baseValue = 13000;
+      volatility = 0.18; 
+      trend = -0.035;
+    } else if (year === 2009) {
+      baseValue = 8500;
+      volatility = 0.14;
+      trend = 0.025; 
+    } else if (year >= 2010 && year <= 2019) {
+      baseValue = 10500 + (year - 2010) * 1200;
+      volatility = 0.07;
+      trend = 0.015;
+    } else if (year === 2020) {
+      baseValue = 28000; 
+      volatility = 0.14;
+      trend = 0.035;
+    } else if (year === 2021) {
+      baseValue = 30000;
+      volatility = 0.07;
+      trend = 0.025;
+    } else if (year === 2022) {
+      baseValue = 35000;
+      volatility = 0.10;
+      trend = -0.015; 
+    } else if (year === 2023) {
+      baseValue = 33000;
+      volatility = 0.08;
+      trend = 0.02; 
+    } else if (year === 2024) {
+      baseValue = 37000;
+      volatility = 0.07;
+      trend = 0.01; 
+    } else {
+      baseValue = 20000; 
+      volatility = 0.07;
+      trend = 0.01;
+    }
+    
+    // Generate daily data points
+    const data: StockDataPoint[] = [];
+    let currentValue = baseValue * (0.95 + Math.random() * 0.1); 
+    const startPrice = currentValue;
+    let highPrice = currentValue;
+    let lowPrice = currentValue;
+    
+    // Generate data for each month (simplified to 12 points per year)
+    for (let month = 0; month < 12; month++) {
+      // Apply trend and random movement
+      currentValue = currentValue * (1 + trend + (Math.random() * 2 - 1) * volatility);
+      
+      // Update high and low prices
+      if (currentValue > highPrice) highPrice = currentValue;
+      if (currentValue < lowPrice) lowPrice = currentValue;
+      
+      // Add data point
+      data.push({
+        date: `${year}-${String(month + 1).padStart(2, '0')}-01`,
+        value: Math.round(currentValue)
+      });
+    }
+    
+    const endPrice = currentValue;
+    const percentageChange = ((endPrice - startPrice) / startPrice) * 100;
+    
+    return {
+      year,
+      data,
+      startPrice: Math.round(startPrice),
+      endPrice: Math.round(endPrice),
+      highPrice: Math.round(highPrice),
+      lowPrice: Math.round(lowPrice),
+      percentageChange: parseFloat(percentageChange.toFixed(2))
+    };
+  });
+};
+
+// Generate Nifty 50 data
+export const generateNifty50Data = (): YearlyStockData[] => {
+  const years = [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 
+                 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 
+                 2021, 2022, 2023, 2024];
+  
+  return years.map(year => {
+    // Base values and trends based on historical Nifty 50 performance
+    let baseValue, volatility, trend;
+    
+    // Simulate historical Nifty 50 performance
+    if (year === 2001) {
+      baseValue = 1200; 
+      volatility = 0.14;
+      trend = -0.025; 
+    } else if (year === 2002) {
+      baseValue = 1100;
+      volatility = 0.15;
+      trend = -0.02; 
+    } else if (year === 2003) {
+      baseValue = 1050;
+      volatility = 0.13;
+      trend = 0.03; 
+    } else if (year >= 2004 && year <= 2007) {
+      baseValue = 1200 + (year - 2004) * 400; 
+      volatility = 0.12;
+      trend = 0.025;
+    } else if (year === 2008) {
+      baseValue = 5000;
+      volatility = 0.22; 
+      trend = -0.05;
+    } else if (year === 2009) {
+      baseValue = 3000;
+      volatility = 0.16;
+      trend = 0.04; 
+    } else if (year >= 2010 && year <= 2019) {
+      baseValue = 5000 + (year - 2010) * 700;
+      volatility = 0.11;
+      trend = 0.018;
+    } else if (year === 2020) {
+      baseValue = 12000; 
+      volatility = 0.17;
+      trend = 0.04;
+    } else if (year === 2021) {
+      baseValue = 14000;
+      volatility = 0.09;
+      trend = 0.035;
+    } else if (year === 2022) {
+      baseValue = 17000;
+      volatility = 0.12;
+      trend = -0.01; 
+    } else if (year === 2023) {
+      baseValue = 17500;
+      volatility = 0.10;
+      trend = 0.03; 
+    } else if (year === 2024) {
+      baseValue = 21000;
+      volatility = 0.08;
+      trend = 0.015; 
+    } else {
+      baseValue = 8000; 
+      volatility = 0.10;
+      trend = 0.015;
+    }
+    
+    // Generate daily data points
+    const data: StockDataPoint[] = [];
+    let currentValue = baseValue * (0.95 + Math.random() * 0.1); 
+    const startPrice = currentValue;
+    let highPrice = currentValue;
+    let lowPrice = currentValue;
+    
+    // Generate data for each month (simplified to 12 points per year)
+    for (let month = 0; month < 12; month++) {
+      // Apply trend and random movement
+      currentValue = currentValue * (1 + trend + (Math.random() * 2 - 1) * volatility);
+      
+      // Update high and low prices
+      if (currentValue > highPrice) highPrice = currentValue;
+      if (currentValue < lowPrice) lowPrice = currentValue;
+      
+      // Add data point
+      data.push({
+        date: `${year}-${String(month + 1).padStart(2, '0')}-01`,
+        value: Math.round(currentValue)
+      });
+    }
+    
+    const endPrice = currentValue;
+    const percentageChange = ((endPrice - startPrice) / startPrice) * 100;
+    
+    return {
+      year,
+      data,
+      startPrice: Math.round(startPrice),
+      endPrice: Math.round(endPrice),
+      highPrice: Math.round(highPrice),
+      lowPrice: Math.round(lowPrice),
+      percentageChange: parseFloat(percentageChange.toFixed(2))
+    };
+  });
+};
+
+// Generate Gold price data
+export const generateGoldData = (): YearlyStockData[] => {
+  const years = [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 
+                 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 
+                 2021, 2022, 2023, 2024];
+  
+  return years.map(year => {
+    // Base values and trends based on historical Gold price performance
+    let baseValue, volatility, trend;
+    
+    // Simulate historical Gold price performance
+    if (year === 2001) {
+      baseValue = 280; 
+      volatility = 0.08;
+      trend = 0.01; 
+    } else if (year === 2002) {
+      baseValue = 310;
+      volatility = 0.08;
+      trend = 0.015; 
+    } else if (year === 2003) {
+      baseValue = 360;
+      volatility = 0.09;
+      trend = 0.02; 
+    } else if (year >= 2004 && year <= 2007) {
+      baseValue = 400 + (year - 2004) * 100; 
+      volatility = 0.09;
+      trend = 0.02;
+    } else if (year === 2008) {
+      baseValue = 850;
+      volatility = 0.15; 
+      trend = 0.025;
+    } else if (year === 2009) {
+      baseValue = 880;
+      volatility = 0.12;
+      trend = 0.03; 
+    } else if (year === 2010) {
+      baseValue = 1100;
+      volatility = 0.10;
+      trend = 0.025;
+    } else if (year === 2011) {
+      baseValue = 1400;
+      volatility = 0.12;
+      trend = 0.03;
+    } else if (year === 2012) {
+      baseValue = 1650;
+      volatility = 0.09;
+      trend = 0.01;
+    } else if (year >= 2013 && year <= 2015) {
+      baseValue = 1700 - (year - 2013) * 150;
+      volatility = 0.10;
+      trend = -0.01;
+    } else if (year >= 2016 && year <= 2019) {
+      baseValue = 1100 + (year - 2016) * 100;
+      volatility = 0.08;
+      trend = 0.015;
+    } else if (year === 2020) {
+      baseValue = 1520; 
+      volatility = 0.11;
+      trend = 0.03;
+    } else if (year === 2021) {
+      baseValue = 1950;
+      volatility = 0.09;
+      trend = -0.005;
+    } else if (year === 2022) {
+      baseValue = 1800;
+      volatility = 0.10;
+      trend = 0.005; 
+    } else if (year === 2023) {
+      baseValue = 1830;
+      volatility = 0.09;
+      trend = 0.015; 
+    } else if (year === 2024) {
+      baseValue = 2050;
+      volatility = 0.08;
+      trend = 0.02; 
+    } else {
+      baseValue = 1000; 
+      volatility = 0.09;
+      trend = 0.01;
+    }
+    
+    // Generate daily data points
+    const data: StockDataPoint[] = [];
+    let currentValue = baseValue * (0.97 + Math.random() * 0.06); 
+    const startPrice = currentValue;
+    let highPrice = currentValue;
+    let lowPrice = currentValue;
+    
+    // Generate data for each month (simplified to 12 points per year)
+    for (let month = 0; month < 12; month++) {
+      // Apply trend and random movement
+      currentValue = currentValue * (1 + trend + (Math.random() * 2 - 1) * volatility);
+      
+      // Update high and low prices
+      if (currentValue > highPrice) highPrice = currentValue;
+      if (currentValue < lowPrice) lowPrice = currentValue;
+      
+      // Add data point
+      data.push({
+        date: `${year}-${String(month + 1).padStart(2, '0')}-01`,
+        value: Math.round(currentValue)
+      });
+    }
+    
+    const endPrice = currentValue;
+    const percentageChange = ((endPrice - startPrice) / startPrice) * 100;
+    
+    return {
+      year,
+      data,
+      startPrice: Math.round(startPrice),
+      endPrice: Math.round(endPrice),
+      highPrice: Math.round(highPrice),
+      lowPrice: Math.round(lowPrice),
+      percentageChange: parseFloat(percentageChange.toFixed(2))
+    };
+  });
+};
+
 // Get data for specific years
 export const getDataForYears = (years: number[]): YearlyStockData[] => {
   const allData = generateNasdaqData();
+  return allData.filter(yearData => years.includes(yearData.year));
+};
+
+// Get Dow Jones data for specific years
+export const getDowJonesData = (years: number[]): YearlyStockData[] => {
+  const allData = generateDowJonesData();
+  return allData.filter(yearData => years.includes(yearData.year));
+};
+
+// Get Nifty 50 data for specific years
+export const getNifty50Data = (years: number[]): YearlyStockData[] => {
+  const allData = generateNifty50Data();
+  return allData.filter(yearData => years.includes(yearData.year));
+};
+
+// Get Gold data for specific years
+export const getGoldData = (years: number[]): YearlyStockData[] => {
+  const allData = generateGoldData();
   return allData.filter(yearData => years.includes(yearData.year));
 };
 

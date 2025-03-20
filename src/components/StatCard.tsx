@@ -11,6 +11,7 @@ interface StatCardProps {
   isPrice?: boolean;
   className?: string;
   delay?: number;
+  currencySymbol?: string;
 }
 
 export function StatCard({
@@ -20,11 +21,12 @@ export function StatCard({
   isPercentage = false,
   isPrice = false,
   className,
-  delay = 0
+  delay = 0,
+  currencySymbol = '$'
 }: StatCardProps) {
   const formattedValue = typeof value === 'number' ? 
     (isPercentage ? formatPercentage(value) : 
-     isPrice ? `$${formatNumber(value)}` : formatNumber(value)) : 
+     isPrice ? `${currencySymbol}${formatNumber(value)}` : formatNumber(value)) : 
     value;
   
   const trendColor = trend ? 
