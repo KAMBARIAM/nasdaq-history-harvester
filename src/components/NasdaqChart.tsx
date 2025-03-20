@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -14,13 +13,12 @@ interface NasdaqChartProps {
 }
 
 const COLORS = [
-  '#0284c7', // nasdaq-600
-  '#0ea5e9', // nasdaq-500  
-  '#38bdf8', // nasdaq-400
-  '#7dd3fc', // nasdaq-300
-  '#bae6fd', // nasdaq-200
-  '#38bdf8', // nasdaq-400
-  '#7dd3fc', // nasdaq-300
+  '#f97316', // Bright Orange
+  '#0ea5e9', // Ocean Blue
+  '#fbbf24', // Yellow
+  '#ec4899', // Pink (additional color)
+  '#8b5cf6', // Purple (additional color)
+  '#10b981', // Emerald (additional color)
 ];
 
 export function NasdaqChart({ selectedData, className }: NasdaqChartProps) {
@@ -29,7 +27,6 @@ export function NasdaqChart({ selectedData, className }: NasdaqChartProps) {
   useEffect(() => {
     if (!selectedData.length) return;
     
-    // Process data for the chart
     const transformedData = processChartData(selectedData);
     setChartData(transformedData);
   }, [selectedData]);
@@ -37,18 +34,14 @@ export function NasdaqChart({ selectedData, className }: NasdaqChartProps) {
   const processChartData = (yearlyData: YearlyStockData[]) => {
     if (!yearlyData.length) return [];
     
-    // Get all months (Jan-Dec)
     const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     
-    // Create transformed data structure
     return monthLabels.map((month, index) => {
       const dataPoint: any = { month };
       
-      // Add value for each year
       yearlyData.forEach(yearData => {
         if (yearData.data[index]) {
           dataPoint[`y${yearData.year}`] = yearData.data[index].value;
-          // Add data point label for tooltip
           dataPoint[`${yearData.year}`] = `$${yearData.data[index].value.toLocaleString()}`;
         }
       });
