@@ -44,7 +44,7 @@ export function StatCard({
       </div>
       {trend !== undefined && (
         <div className={cn("text-xs font-medium mt-1", trendColor)}>
-          {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}%
+          {trend > 0 ? '↑' : '↓'} {Math.abs(trend).toFixed(2)}%
         </div>
       )}
     </motion.div>

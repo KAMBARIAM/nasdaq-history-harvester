@@ -129,7 +129,8 @@ export const formatNumber = (num: number): string => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
-// Format percentage with + or - sign
+// Format percentage with + or - sign and exactly 2 decimal places
 export const formatPercentage = (percentage: number): string => {
-  return percentage > 0 ? `+${percentage}%` : `${percentage}%`;
+  const formattedValue = percentage.toFixed(2);
+  return percentage > 0 ? `+${formattedValue}%` : `${formattedValue}%`;
 };
