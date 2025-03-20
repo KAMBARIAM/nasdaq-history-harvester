@@ -18,9 +18,13 @@ const COLORS = [
   '#f97316', // Bright Orange
   '#0ea5e9', // Ocean Blue
   '#fbbf24', // Yellow
-  '#ec4899', // Pink (additional color)
-  '#8b5cf6', // Purple (additional color)
-  '#10b981', // Emerald (additional color)
+  '#ec4899', // Pink
+  '#8b5cf6', // Purple
+  '#10b981', // Emerald
+  '#ef4444', // Red
+  '#06b6d4', // Cyan
+  '#84cc16', // Lime
+  '#14b8a6', // Teal
 ];
 
 export function NasdaqChart({ selectedData, className, currency = '$' }: NasdaqChartProps) {

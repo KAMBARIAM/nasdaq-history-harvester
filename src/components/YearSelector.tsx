@@ -13,7 +13,7 @@ interface YearSelectorProps {
 export function YearSelector({
   years,
   selectedYears,
-  maxSelections = 3,
+  maxSelections = 5,
   onChange
 }: YearSelectorProps) {
   const [yearItems, setYearItems] = useState<number[]>(years);

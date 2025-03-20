@@ -15,7 +15,7 @@ const availableYears = [
 ];
 
 export function CompareView() {
-  const [selectedYears, setSelectedYears] = useState<number[]>([2008, 2020, 2024]);
+  const [selectedYears, setSelectedYears] = useState<number[]>([2008, 2020, 2022, 2023, 2024]);
   const [nasdaqData, setNasdaqData] = useState<YearlyStockData[]>([]);
   const [dowJonesData, setDowJonesData] = useState<YearlyStockData[]>([]);
   const [nifty50Data, setNifty50Data] = useState<YearlyStockData[]>([]);
