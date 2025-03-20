@@ -16,30 +16,69 @@ export interface YearlyStockData {
 
 // Generate mock NASDAQ data for different years
 export const generateNasdaqData = (): YearlyStockData[] => {
-  const years = [2018, 2019, 2020, 2021, 2022, 2023, 2024];
+  const years = [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 
+                 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 
+                 2021, 2022, 2023, 2024];
   
   return years.map(year => {
-    // Base values vary by year to simulate different market conditions
-    const baseValue = year === 2020 ? 9000 : 
-                     year === 2021 ? 12500 : 
-                     year === 2022 ? 15000 :
-                     year === 2023 ? 14000 :
-                     year === 2024 ? 17500 :
-                     year < 2020 ? 7000 : 10000;
+    // Base values and trends based on historical NASDAQ-100 performance
+    let baseValue, volatility, trend;
     
-    // Volatility adjustments by year
-    const volatility = year === 2020 ? 0.15 : // Higher volatility for 2020 (COVID)
-                      year === 2022 ? 0.12 : // Higher for 2022 (market correction)
-                      0.08; // Normal volatility
-    
-    // Trend adjustments by year
-    const trend = year === 2018 ? -0.01 : // Slight downtrend
-                 year === 2020 ? 0.04 : // Strong uptrend after initial COVID drop
-                 year === 2021 ? 0.03 : // Continued growth
-                 year === 2022 ? -0.02 : // Downtrend
-                 year === 2023 ? 0.025 : // Recovery
-                 year === 2024 ? 0.015 : // Current year
-                 0.01; // Default slight uptrend
+    // Simulate the dot-com bubble burst, financial crisis, and other major events
+    if (year === 2001) {
+      baseValue = 4000; // End of dot-com bubble
+      volatility = 0.18;
+      trend = -0.03; // Declining market
+    } else if (year === 2002) {
+      baseValue = 3000;
+      volatility = 0.16;
+      trend = -0.04; // Continued decline post bubble
+    } else if (year === 2003) {
+      baseValue = 2500;
+      volatility = 0.13;
+      trend = 0.02; // Beginning of recovery
+    } else if (year >= 2004 && year <= 2007) {
+      baseValue = 2800 + (year - 2004) * 500; // Steady growth period
+      volatility = 0.09;
+      trend = 0.015;
+    } else if (year === 2008) {
+      baseValue = 4500;
+      volatility = 0.20; // Financial crisis volatility
+      trend = -0.04; // Sharp decline
+    } else if (year === 2009) {
+      baseValue = 3000;
+      volatility = 0.15;
+      trend = 0.03; // Recovery begins
+    } else if (year >= 2010 && year <= 2019) {
+      // Post-financial crisis bull market
+      baseValue = 4000 + (year - 2010) * 600;
+      volatility = 0.08;
+      trend = 0.02;
+    } else if (year === 2020) {
+      baseValue = 9000; // COVID crash and recovery
+      volatility = 0.15;
+      trend = 0.04;
+    } else if (year === 2021) {
+      baseValue = 12500;
+      volatility = 0.08;
+      trend = 0.03;
+    } else if (year === 2022) {
+      baseValue = 15000;
+      volatility = 0.12;
+      trend = -0.02; // Tech correction
+    } else if (year === 2023) {
+      baseValue = 14000;
+      volatility = 0.09;
+      trend = 0.025; // Recovery
+    } else if (year === 2024) {
+      baseValue = 17500;
+      volatility = 0.08;
+      trend = 0.015; // Current year
+    } else {
+      baseValue = 10000; // Fallback
+      volatility = 0.08;
+      trend = 0.01;
+    }
     
     // Generate daily data points
     const data: StockDataPoint[] = [];

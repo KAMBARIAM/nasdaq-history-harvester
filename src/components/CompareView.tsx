@@ -7,10 +7,14 @@ import NasdaqChart from './NasdaqChart';
 import StatCard from './StatCard';
 import { YearlyStockData, getDataForYears } from '@/utils/stockData';
 
-const availableYears = [2018, 2019, 2020, 2021, 2022, 2023, 2024];
+const availableYears = [
+  2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+  2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
+  2021, 2022, 2023, 2024
+];
 
 export function CompareView() {
-  const [selectedYears, setSelectedYears] = useState<number[]>([2022, 2023, 2024]);
+  const [selectedYears, setSelectedYears] = useState<number[]>([2008, 2020, 2024]);
   const [yearlyData, setYearlyData] = useState<YearlyStockData[]>([]);
   
   useEffect(() => {
@@ -32,11 +36,11 @@ export function CompareView() {
         className="mb-6"
       >
         <h2 className="text-xl font-medium text-gray-800">NASDAQ-100 Historical Comparison</h2>
-        <p className="text-gray-500 mt-1">Compare index performance across multiple years</p>
+        <p className="text-gray-500 mt-1">Compare index performance across multiple years (2001-present)</p>
       </motion.div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 space-y-6">
           <YearSelector 
             years={availableYears}
             selectedYears={selectedYears}
@@ -50,7 +54,7 @@ export function CompareView() {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: 0.1 * index }}
-              className="mt-6 glass-panel p-5"
+              className="glass-panel p-5"
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-medium">{data.year}</h3>
