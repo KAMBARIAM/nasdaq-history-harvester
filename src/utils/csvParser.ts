@@ -90,7 +90,20 @@ export const CSV_URLS = {
   nasdaq: '/data/nasdaq.csv',
   dowjones: '/data/dowjones.csv', 
   nifty50: '/data/nifty50.csv',
+  niftybank: '/data/niftybank.csv',
+  niftyit: '/data/niftyit.csv',
+  niftypharma: '/data/niftypharma.csv',
+  niftyauto: '/data/niftyauto.csv',
   gold: '/data/gold.csv'
+};
+
+// Nifty indices map for display names
+export const NIFTY_INDICES = {
+  nifty50: 'Nifty 50',
+  niftybank: 'Nifty Bank',
+  niftyit: 'Nifty IT',
+  niftypharma: 'Nifty Pharma',
+  niftyauto: 'Nifty Auto'
 };
 
 // Example data loader to replace the simulated data
@@ -103,6 +116,11 @@ export const loadStockDataFromCSV = async (indexType: string = 'nasdaq'): Promis
     console.error(`Error loading ${indexType} data from CSV:`, error);
     // Fallback to simulated data
     const { generateNasdaqData, generateDowJonesData, generateNifty50Data, generateGoldData } = await import('./stockData');
+    
+    // For new Nifty indices, fall back to Nifty 50 data
+    if (indexType.startsWith('nifty') && indexType !== 'nifty50') {
+      return generateNifty50Data();
+    }
     
     switch (indexType) {
       case 'nasdaq': return generateNasdaqData();

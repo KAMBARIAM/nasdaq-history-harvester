@@ -6,10 +6,11 @@ import YearSelector, { IntervalRange } from './YearSelector';
 import NasdaqChart from './NasdaqChart';
 import StatCard from './StatCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { YearlyStockData, getDataForYears, getDowJonesData, getNifty50Data, getGoldData } from '@/utils/stockData';
-import { loadStockDataFromCSV, parseCSV, convertCSVToStockData } from '@/utils/csvParser';
+import { loadStockDataFromCSV, parseCSV, convertCSVToStockData, NIFTY_INDICES } from '@/utils/csvParser';
 
 const availableYears = [
   2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
@@ -27,6 +28,7 @@ export function CompareView() {
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [interval, setInterval] = useState<IntervalRange>({ start: 1, end: 12 });
   const [dataSource, setDataSource] = useState<'simulated' | 'csv'>('simulated');
+  const [selectedNiftyIndex, setSelectedNiftyIndex] = useState<string>('nifty50');
   
   useEffect(() => {
     // Load data based on the chosen source
@@ -38,12 +40,12 @@ export function CompareView() {
           // Load from CSV files
           const nasdaqResult = await loadStockDataFromCSV('nasdaq');
           const dowJonesResult = await loadStockDataFromCSV('dowjones');
-          const nifty50Result = await loadStockDataFromCSV('nifty50');
+          const niftyResult = await loadStockDataFromCSV(selectedNiftyIndex);
           const goldResult = await loadStockDataFromCSV('gold');
           
           setNasdaqData(filterDataForYears(nasdaqResult, selectedYears));
           setDowJonesData(filterDataForYears(dowJonesResult, selectedYears));
-          setNifty50Data(filterDataForYears(nifty50Result, selectedYears));
+          setNifty50Data(filterDataForYears(niftyResult, selectedYears));
           setGoldData(filterDataForYears(goldResult, selectedYears));
           
           toast.success('CSV data loaded successfully');
@@ -79,7 +81,7 @@ export function CompareView() {
     };
     
     loadData();
-  }, [selectedYears, dataSource]);
+  }, [selectedYears, dataSource, selectedNiftyIndex]);
 
   const filterDataForYears = (data: YearlyStockData[], years: number[]): YearlyStockData[] => {
     return data.filter(yearData => years.includes(yearData.year));
@@ -111,7 +113,12 @@ export function CompareView() {
           setDowJonesData(filterDataForYears(stockData, selectedYears));
           break;
         case 'nifty50':
+        case 'niftybank':
+        case 'niftyit':
+        case 'niftypharma':
+        case 'niftyauto':
           setNifty50Data(filterDataForYears(stockData, selectedYears));
+          setSelectedNiftyIndex(index);
           break;
         case 'gold':
           setGoldData(filterDataForYears(stockData, selectedYears));
@@ -126,6 +133,17 @@ export function CompareView() {
     }
   };
 
+  const handleNiftyIndexChange = (value: string) => {
+    setSelectedNiftyIndex(value);
+    // If we're in CSV mode, we'll need to reload the data
+    if (dataSource === 'csv') {
+      loadStockDataFromCSV(value).then(data => {
+        setNifty50Data(filterDataForYears(data, selectedYears));
+        toast.success(`${NIFTY_INDICES[value as keyof typeof NIFTY_INDICES]} data loaded`);
+      });
+    }
+  };
+
   const getActiveData = () => {
     switch(activeTab) {
       case "nasdaq": return nasdaqData;
@@ -137,10 +155,13 @@ export function CompareView() {
   };
 
   const getTabTitle = () => {
+    if (activeTab === 'nifty50') {
+      return NIFTY_INDICES[selectedNiftyIndex as keyof typeof NIFTY_INDICES];
+    }
+    
     switch(activeTab) {
       case "nasdaq": return "NASDAQ-100";
       case "dowjones": return "Dow Jones";
-      case "nifty50": return "Nifty 50";
       case "gold": return "Gold";
       default: return "NASDAQ-100";
     }
@@ -148,6 +169,10 @@ export function CompareView() {
 
   const getCurrencySymbol = () => {
     return activeTab === 'nifty50' ? '₹' : '$';
+  };
+
+  const getNiftyFileUploadId = () => {
+    return `csv-upload-${selectedNiftyIndex}`;
   };
 
   return (
@@ -188,7 +213,7 @@ export function CompareView() {
         <TabsList className="grid grid-cols-4 mb-6">
           <TabsTrigger value="nasdaq">NASDAQ-100</TabsTrigger>
           <TabsTrigger value="dowjones">Dow Jones</TabsTrigger>
-          <TabsTrigger value="nifty50">Nifty 50</TabsTrigger>
+          <TabsTrigger value="nifty50">Nifty Indices</TabsTrigger>
           <TabsTrigger value="gold">Gold</TabsTrigger>
         </TabsList>
         
@@ -196,6 +221,26 @@ export function CompareView() {
           <TabsContent key={tabValue} value={tabValue} className="mt-0">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-1 space-y-6">
+                {/* Nifty Index Selector - Only show for Nifty tab */}
+                {tabValue === 'nifty50' && (
+                  <div className="glass-panel p-4">
+                    <h3 className="text-sm text-gray-500 font-medium mb-3">Select Nifty Index</h3>
+                    <Select 
+                      value={selectedNiftyIndex} 
+                      onValueChange={handleNiftyIndexChange}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a Nifty index" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(NIFTY_INDICES).map(([value, label]) => (
+                          <SelectItem key={value} value={value}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              
                 <YearSelector 
                   years={availableYears}
                   selectedYears={selectedYears}
@@ -214,11 +259,11 @@ export function CompareView() {
                         type="file"
                         accept=".csv"
                         className="hidden"
-                        id={`csv-upload-${tabValue}`}
-                        onChange={(e) => handleFileUpload(e, tabValue)}
+                        id={tabValue === 'nifty50' ? getNiftyFileUploadId() : `csv-upload-${tabValue}`}
+                        onChange={(e) => handleFileUpload(e, tabValue === 'nifty50' ? selectedNiftyIndex : tabValue)}
                       />
                       <label 
-                        htmlFor={`csv-upload-${tabValue}`}
+                        htmlFor={tabValue === 'nifty50' ? getNiftyFileUploadId() : `csv-upload-${tabValue}`}
                         className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors cursor-pointer text-sm"
                       >
                         <Upload size={16} />

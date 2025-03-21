@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -47,21 +46,19 @@ export function NasdaqChart({
   const processChartData = (yearlyData: YearlyStockData[], interval: IntervalRange) => {
     if (!yearlyData.length) return [];
     
-    // Create a map to store all dates and their values by year
     const allDataPoints: { [date: string]: any } = {};
     
-    // Filter data by month interval and collect all data points
     yearlyData.forEach(yearData => {
       const filteredData = yearData.data.filter(dataPoint => {
         if (!dataPoint.date) return false;
         
         const date = new Date(dataPoint.date);
-        const month = date.getMonth() + 1; // JavaScript months are 0-indexed
+        const month = date.getMonth() + 1;
         return month >= interval.start && month <= interval.end;
       });
       
       filteredData.forEach(dataPoint => {
-        const date = dataPoint.date.substring(5); // Get MM-DD format
+        const date = dataPoint.date.substring(5);
         if (!allDataPoints[date]) {
           allDataPoints[date] = { date };
         }
@@ -71,9 +68,7 @@ export function NasdaqChart({
       });
     });
     
-    // Convert the map to an array and sort by date
     return Object.values(allDataPoints).sort((a, b) => {
-      // Parse MM-DD format
       const [aMonth, aDay] = a.date.split('-').map(Number);
       const [bMonth, bDay] = b.date.split('-').map(Number);
       
@@ -108,17 +103,14 @@ export function NasdaqChart({
     return null;
   };
 
-  // Customized date formatter for X-axis
   const formatXAxis = (dateStr: string) => {
     if (!dateStr) return '';
     
-    // For MM-DD format
     const dateParts = dateStr.split('-');
     if (dateParts.length === 2) {
       const month = parseInt(dateParts[0]);
       const day = parseInt(dateParts[1]);
       
-      // Show only every 15th day or 1st of month to avoid overcrowding
       if (day === 1 || day === 15) {
         const monthNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         return `${monthNames[month]} ${day}`;
@@ -170,7 +162,7 @@ export function NasdaqChart({
               name={`y${yearData.year}`}
               stroke={COLORS[index % COLORS.length]}
               strokeWidth={2}
-              dot={false} // Don't show dots for daily data (too crowded)
+              dot={false}
               activeDot={{ r: 6, strokeWidth: 2 }}
               animationDuration={1500}
               animationEasing="ease-in-out"
