@@ -7,9 +7,11 @@ import {
 } from 'recharts';
 import { YearlyStockData } from '@/utils/stockData';
 import { cn } from '@/lib/utils';
+import { IntervalRange } from './YearSelector';
 
 interface NasdaqChartProps {
   selectedData: YearlyStockData[];
+  interval?: IntervalRange;
   className?: string;
   currency?: string;
 }
@@ -27,28 +29,54 @@ const COLORS = [
   '#14b8a6', // Teal
 ];
 
-export function NasdaqChart({ selectedData, className, currency = '$' }: NasdaqChartProps) {
+export function NasdaqChart({ 
+  selectedData, 
+  interval = { start: 1, end: 12 }, 
+  className, 
+  currency = '$' 
+}: NasdaqChartProps) {
   const [chartData, setChartData] = useState<any[]>([]);
   
   useEffect(() => {
     if (!selectedData.length) return;
     
-    const transformedData = processChartData(selectedData);
+    const transformedData = processChartData(selectedData, interval);
     setChartData(transformedData);
-  }, [selectedData]);
+  }, [selectedData, interval]);
 
-  const processChartData = (yearlyData: YearlyStockData[]) => {
+  const processChartData = (yearlyData: YearlyStockData[], interval: IntervalRange) => {
     if (!yearlyData.length) return [];
     
     const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const filteredMonthIndices = Array.from(
+      { length: interval.end - interval.start + 1 }, 
+      (_, i) => i + interval.start - 1
+    );
     
-    return monthLabels.map((month, index) => {
+    // Use only the months within the selected interval
+    return filteredMonthIndices.map((monthIndex) => {
+      const month = monthLabels[monthIndex];
       const dataPoint: any = { month };
       
       yearlyData.forEach(yearData => {
-        if (yearData.data[index]) {
-          dataPoint[`y${yearData.year}`] = yearData.data[index].value;
-          dataPoint[`${yearData.year}`] = `${currency}${yearData.data[index].value.toLocaleString()}`;
+        // Handle case where data might have actual dates
+        if (yearData.data.length === 12) {
+          // For simulated data with 12 months
+          if (yearData.data[monthIndex]) {
+            dataPoint[`y${yearData.year}`] = yearData.data[monthIndex].value;
+            dataPoint[`${yearData.year}`] = `${currency}${yearData.data[monthIndex].value.toLocaleString()}`;
+          }
+        } else {
+          // For actual data with dates, filter by month
+          const monthData = yearData.data.find(d => {
+            const date = new Date(d.date);
+            return date.getMonth() === monthIndex;
+          });
+          
+          if (monthData) {
+            dataPoint[`y${yearData.year}`] = monthData.value;
+            dataPoint[`${yearData.year}`] = `${currency}${monthData.value.toLocaleString()}`;
+          }
         }
       });
       
