@@ -16,7 +16,7 @@ export const parseCSV = (csv: string): string[][] => {
   return lines.map(line => line.split(',').map(item => item.trim()));
 };
 
-// Convert CSV data to YearlyStockData format
+// Convert CSV data to YearlyStockData format with daily data points
 export const convertCSVToStockData = (csvData: string[][], dateIndex: number = 0, valueIndex: number = 1): YearlyStockData[] => {
   // Skip header row if it exists
   const dataRows = csvData[0][0].toLowerCase().includes('date') ? csvData.slice(1) : csvData;

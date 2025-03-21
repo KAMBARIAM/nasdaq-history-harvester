@@ -47,40 +47,38 @@ export function NasdaqChart({
   const processChartData = (yearlyData: YearlyStockData[], interval: IntervalRange) => {
     if (!yearlyData.length) return [];
     
-    const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const filteredMonthIndices = Array.from(
-      { length: interval.end - interval.start + 1 }, 
-      (_, i) => i + interval.start - 1
-    );
+    // Create a map to store all dates and their values by year
+    const allDataPoints: { [date: string]: any } = {};
     
-    // Use only the months within the selected interval
-    return filteredMonthIndices.map((monthIndex) => {
-      const month = monthLabels[monthIndex];
-      const dataPoint: any = { month };
-      
-      yearlyData.forEach(yearData => {
-        // Handle case where data might have actual dates
-        if (yearData.data.length === 12) {
-          // For simulated data with 12 months
-          if (yearData.data[monthIndex]) {
-            dataPoint[`y${yearData.year}`] = yearData.data[monthIndex].value;
-            dataPoint[`${yearData.year}`] = `${currency}${yearData.data[monthIndex].value.toLocaleString()}`;
-          }
-        } else {
-          // For actual data with dates, filter by month
-          const monthData = yearData.data.find(d => {
-            const date = new Date(d.date);
-            return date.getMonth() === monthIndex;
-          });
-          
-          if (monthData) {
-            dataPoint[`y${yearData.year}`] = monthData.value;
-            dataPoint[`${yearData.year}`] = `${currency}${monthData.value.toLocaleString()}`;
-          }
-        }
+    // Filter data by month interval and collect all data points
+    yearlyData.forEach(yearData => {
+      const filteredData = yearData.data.filter(dataPoint => {
+        if (!dataPoint.date) return false;
+        
+        const date = new Date(dataPoint.date);
+        const month = date.getMonth() + 1; // JavaScript months are 0-indexed
+        return month >= interval.start && month <= interval.end;
       });
       
-      return dataPoint;
+      filteredData.forEach(dataPoint => {
+        const date = dataPoint.date.substring(5); // Get MM-DD format
+        if (!allDataPoints[date]) {
+          allDataPoints[date] = { date };
+        }
+        
+        allDataPoints[date][`y${yearData.year}`] = dataPoint.value;
+        allDataPoints[date][`${yearData.year}`] = `${currency}${dataPoint.value.toLocaleString()}`;
+      });
+    });
+    
+    // Convert the map to an array and sort by date
+    return Object.values(allDataPoints).sort((a, b) => {
+      // Parse MM-DD format
+      const [aMonth, aDay] = a.date.split('-').map(Number);
+      const [bMonth, bDay] = b.date.split('-').map(Number);
+      
+      if (aMonth !== bMonth) return aMonth - bMonth;
+      return aDay - bDay;
     });
   };
 
@@ -110,6 +108,26 @@ export function NasdaqChart({
     return null;
   };
 
+  // Customized date formatter for X-axis
+  const formatXAxis = (dateStr: string) => {
+    if (!dateStr) return '';
+    
+    // For MM-DD format
+    const dateParts = dateStr.split('-');
+    if (dateParts.length === 2) {
+      const month = parseInt(dateParts[0]);
+      const day = parseInt(dateParts[1]);
+      
+      // Show only every 15th day or 1st of month to avoid overcrowding
+      if (day === 1 || day === 15) {
+        const monthNames = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `${monthNames[month]} ${day}`;
+      }
+    }
+    
+    return '';
+  };
+
   return (
     <motion.div 
       className={cn("chart-container glass-panel p-4", className)}
@@ -124,10 +142,12 @@ export function NasdaqChart({
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
           <XAxis 
-            dataKey="month" 
+            dataKey="date" 
             tick={{ fontSize: 12 }}
             tickLine={false}
             axisLine={{ stroke: '#e0e0e0' }}
+            tickFormatter={formatXAxis}
+            interval={0}
           />
           <YAxis 
             tickFormatter={(value) => `${currency}${value.toLocaleString()}`}
@@ -150,7 +170,7 @@ export function NasdaqChart({
               name={`y${yearData.year}`}
               stroke={COLORS[index % COLORS.length]}
               strokeWidth={2}
-              dot={{ r: 4, strokeWidth: 2 }}
+              dot={false} // Don't show dots for daily data (too crowded)
               activeDot={{ r: 6, strokeWidth: 2 }}
               animationDuration={1500}
               animationEasing="ease-in-out"
