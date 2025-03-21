@@ -2,7 +2,13 @@
 /**
  * Utility functions for parsing CSV stock data
  */
-import { YearlyStockData, StockDataPoint } from './stockData';
+import { YearlyStockData } from './stockData';
+
+// Define StockDataPoint interface if not exported from stockData
+interface StockDataPoint {
+  date: string;
+  value: number;
+}
 
 // Parse CSV string to arrays of data
 export const parseCSV = (csv: string): string[][] => {

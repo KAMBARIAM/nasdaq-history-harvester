@@ -123,9 +123,9 @@ export function YearSelector({
       {onIntervalChange && (
         <div className="mt-6 pt-4 border-t border-gray-100">
           <h3 className="text-sm text-gray-500 font-medium mb-4">Select Month Range</h3>
-          <div className="px-2 mb-6">
+          <div className="px-2 mb-2">
             <Slider 
-              defaultValue={[1, 12]} 
+              defaultValue={[interval.start, interval.end]} 
               value={monthRange}
               min={1} 
               max={12} 
@@ -133,10 +133,60 @@ export function YearSelector({
               onValueChange={handleMonthRangeChange}
               className="mb-6"
             />
-            <div className="flex justify-between text-xs text-gray-500">
+            
+            <div className="flex justify-between text-xs text-gray-500 mb-4">
               <span>{monthNames[monthRange[0] - 1]}</span>
               <span> to </span>
               <span>{monthNames[monthRange[1] - 1]}</span>
+            </div>
+            
+            {/* Month range selector with direct inputs */}
+            <div className="flex items-center justify-between gap-4">
+              <div className="w-1/2">
+                <label className="text-xs text-gray-500 block mb-1">Start Month</label>
+                <select 
+                  value={monthRange[0]} 
+                  onChange={(e) => {
+                    const start = parseInt(e.target.value);
+                    const end = Math.max(monthRange[1], start);
+                    const newRange = [start, end];
+                    setMonthRange(newRange);
+                    if (onIntervalChange) {
+                      onIntervalChange({ start, end });
+                    }
+                  }}
+                  className="w-full p-2 text-sm border border-gray-300 rounded bg-white"
+                >
+                  {monthNames.map((month, index) => (
+                    <option key={`start-${index}`} value={index + 1} disabled={index + 1 > monthRange[1]}>
+                      {month}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="w-1/2">
+                <label className="text-xs text-gray-500 block mb-1">End Month</label>
+                <select 
+                  value={monthRange[1]} 
+                  onChange={(e) => {
+                    const end = parseInt(e.target.value);
+                    const start = Math.min(monthRange[0], end);
+                    const newRange = [start, end];
+                    setMonthRange(newRange);
+                    if (onIntervalChange) {
+                      onIntervalChange({ start, end });
+                    }
+                  }}
+                  className="w-full p-2 text-sm border border-gray-300 rounded bg-white"
+                >
+                  {monthNames.map((month, index) => (
+                    <option key={`end-${index}`} value={index + 1} disabled={index + 1 < monthRange[0]}>
+                      {month}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         </div>
