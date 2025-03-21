@@ -94,7 +94,8 @@ export const CSV_URLS = {
   niftyit: '/data/niftyit.csv',
   niftypharma: '/data/niftypharma.csv',
   niftyauto: '/data/niftyauto.csv',
-  gold: '/data/gold.csv'
+  gold: '/data/gold.csv',
+  silver: '/data/silver.csv'
 };
 
 // Nifty indices map for display names
@@ -115,7 +116,7 @@ export const loadStockDataFromCSV = async (indexType: string = 'nasdaq'): Promis
   } catch (error) {
     console.error(`Error loading ${indexType} data from CSV:`, error);
     // Fallback to simulated data
-    const { generateNasdaqData, generateDowJonesData, generateNifty50Data, generateGoldData } = await import('./stockData');
+    const { generateNasdaqData, generateDowJonesData, generateNifty50Data, generateGoldData, generateSilverData } = await import('./stockData');
     
     // For new Nifty indices, fall back to Nifty 50 data
     if (indexType.startsWith('nifty') && indexType !== 'nifty50') {
@@ -127,6 +128,7 @@ export const loadStockDataFromCSV = async (indexType: string = 'nasdaq'): Promis
       case 'dowjones': return generateDowJonesData();
       case 'nifty50': return generateNifty50Data();
       case 'gold': return generateGoldData();
+      case 'silver': return generateSilverData();
       default: return generateNasdaqData();
     }
   }

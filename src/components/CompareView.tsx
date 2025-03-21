@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { YearlyStockData, getDataForYears, getDowJonesData, getNifty50Data, getGoldData } from '@/utils/stockData';
+import { YearlyStockData, getDataForYears, getDowJonesData, getNifty50Data, getGoldData, getSilverData } from '@/utils/stockData';
 import { loadStockDataFromCSV, parseCSV, convertCSVToStockData, NIFTY_INDICES } from '@/utils/csvParser';
 
 const availableYears = [
@@ -24,6 +24,7 @@ export function CompareView() {
   const [dowJonesData, setDowJonesData] = useState<YearlyStockData[]>([]);
   const [nifty50Data, setNifty50Data] = useState<YearlyStockData[]>([]);
   const [goldData, setGoldData] = useState<YearlyStockData[]>([]);
+  const [silverData, setSilverData] = useState<YearlyStockData[]>([]);
   const [activeTab, setActiveTab] = useState("nasdaq");
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [interval, setInterval] = useState<IntervalRange>({ start: 1, end: 12 });
@@ -42,11 +43,13 @@ export function CompareView() {
           const dowJonesResult = await loadStockDataFromCSV('dowjones');
           const niftyResult = await loadStockDataFromCSV(selectedNiftyIndex);
           const goldResult = await loadStockDataFromCSV('gold');
+          const silverResult = await loadStockDataFromCSV('silver');
           
           setNasdaqData(filterDataForYears(nasdaqResult, selectedYears));
           setDowJonesData(filterDataForYears(dowJonesResult, selectedYears));
           setNifty50Data(filterDataForYears(niftyResult, selectedYears));
           setGoldData(filterDataForYears(goldResult, selectedYears));
+          setSilverData(filterDataForYears(silverResult, selectedYears));
           
           toast.success('CSV data loaded successfully');
         } else {
@@ -55,11 +58,13 @@ export function CompareView() {
           const dowJonesYearlyData = getDowJonesData(selectedYears);
           const nifty50YearlyData = getNifty50Data(selectedYears);
           const goldYearlyData = getGoldData(selectedYears);
+          const silverYearlyData = getSilverData(selectedYears);
           
           setNasdaqData(nasdaqYearlyData);
           setDowJonesData(dowJonesYearlyData);
           setNifty50Data(nifty50YearlyData);
           setGoldData(goldYearlyData);
+          setSilverData(silverYearlyData);
         }
       } catch (error) {
         console.error("Error loading data:", error);
@@ -70,11 +75,13 @@ export function CompareView() {
         const dowJonesYearlyData = getDowJonesData(selectedYears);
         const nifty50YearlyData = getNifty50Data(selectedYears);
         const goldYearlyData = getGoldData(selectedYears);
+        const silverYearlyData = getSilverData(selectedYears);
         
         setNasdaqData(nasdaqYearlyData);
         setDowJonesData(dowJonesYearlyData);
         setNifty50Data(nifty50YearlyData);
         setGoldData(goldYearlyData);
+        setSilverData(silverYearlyData);
       } finally {
         setIsLoadingData(false);
       }
@@ -123,6 +130,9 @@ export function CompareView() {
         case 'gold':
           setGoldData(filterDataForYears(stockData, selectedYears));
           break;
+        case 'silver':
+          setSilverData(filterDataForYears(stockData, selectedYears));
+          break;
       }
       
       toast.success(`${index.toUpperCase()} data loaded from CSV`);
@@ -150,6 +160,7 @@ export function CompareView() {
       case "dowjones": return dowJonesData;
       case "nifty50": return nifty50Data;
       case "gold": return goldData;
+      case "silver": return silverData;
       default: return nasdaqData;
     }
   };
@@ -163,6 +174,7 @@ export function CompareView() {
       case "nasdaq": return "NASDAQ-100";
       case "dowjones": return "Dow Jones";
       case "gold": return "Gold";
+      case "silver": return "Silver";
       default: return "NASDAQ-100";
     }
   };
@@ -210,14 +222,15 @@ export function CompareView() {
         className="w-full"
         onValueChange={(value) => setActiveTab(value)}
       >
-        <TabsList className="grid grid-cols-4 mb-6">
+        <TabsList className="grid grid-cols-5 mb-6">
           <TabsTrigger value="nasdaq">NASDAQ-100</TabsTrigger>
           <TabsTrigger value="dowjones">Dow Jones</TabsTrigger>
           <TabsTrigger value="nifty50">Nifty Indices</TabsTrigger>
           <TabsTrigger value="gold">Gold</TabsTrigger>
+          <TabsTrigger value="silver">Silver</TabsTrigger>
         </TabsList>
         
-        {['nasdaq', 'dowjones', 'nifty50', 'gold'].map((tabValue) => (
+        {['nasdaq', 'dowjones', 'nifty50', 'gold', 'silver'].map((tabValue) => (
           <TabsContent key={tabValue} value={tabValue} className="mt-0">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-1 space-y-6">
